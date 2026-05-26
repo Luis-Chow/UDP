@@ -1,0 +1,31 @@
+# Dependencias
+node_modules/
+
+# Videos de prueba (no se versionan, pesan demasiado)
+servidor/videos/*.mp4
+servidor/videos/*.MP4
+servidor/videos/*.mkv
+servidor/videos/*.avi
+servidor/videos/*.mov
+servidor/videos/*.webm
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Variables de entorno
+.env
+.env.local
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo

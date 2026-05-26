@@ -1,0 +1,16 @@
+{
+  "name": "udp-video-streaming",
+  "version": "1.0.0",
+  "description": "Aplicacion web para visualizar videos MP4 utilizando el protocolo UDP",
+  "main": "servidor/index.js",
+  "scripts": {
+    "start": "node servidor/index.js",
+    "udp": "node servidor/servidor-udp.js",
+    "web": "node servidor/servidor-web.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  },
+  "author": "",
+  "license": "MIT"
+}

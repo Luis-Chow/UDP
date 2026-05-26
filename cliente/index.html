@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yutuv</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <header class="encabezado">
+        <h1>Yutuv</h1>
+        <div class="estado-conexion">
+            <span id="indicador-estado" class="indicador desconectado"></span>
+            <span id="texto-estado">Conectando...</span>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <section class="panel-reproductor">
+            <div class="cabecera-panel">
+                <h2 id="titulo-video">Selecciona un video</h2>
+            </div>
+
+            <div class="contenedor-video">
+                <video id="reproductor" controls></video>
+                <div id="cargando" class="cargando oculto">
+                    <div class="anillo"></div>
+                    <p id="texto-cargando">Recibiendo paquetes UDP...</p>
+                    <div class="barra-progreso">
+                        <div id="relleno-progreso" class="relleno-progreso"></div>
+                    </div>
+                    <p id="porcentaje" class="porcentaje">0%</p>
+                </div>
+            </div>
+
+            <div class="estadisticas">
+                <h3>Estadisticas de la transmision UDP</h3>
+                <div class="rejilla-estadisticas">
+                    <div class="estadistica">
+                        <span class="etiqueta">Video</span>
+                        <span id="stat-nombre" class="valor">-</span>
+                    </div>
+                    <div class="estadistica">
+                        <span class="etiqueta">Tamano</span>
+                        <span id="stat-tamano" class="valor">-</span>
+                    </div>
+                    <div class="estadistica">
+                        <span class="etiqueta">Paquetes esperados</span>
+                        <span id="stat-esperados" class="valor">-</span>
+                    </div>
+                    <div class="estadistica">
+                        <span class="etiqueta">Paquetes recibidos</span>
+                        <span id="stat-recibidos" class="valor">-</span>
+                    </div>
+                    <div class="estadistica">
+                        <span class="etiqueta">Paquetes perdidos</span>
+                        <span id="stat-perdidos" class="valor">-</span>
+                    </div>
+                    <div class="estadistica">
+                        <span class="etiqueta">Tiempo</span>
+                        <span id="stat-tiempo" class="valor">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="registro">
+                <h3>Registro</h3>
+                <pre id="registro" class="caja-registro"></pre>
+            </div>
+        </section>
+
+        <section class="panel-lista">
+            <div class="cabecera-panel">
+                <h2>Videos disponibles</h2>
+                <button id="boton-actualizar" class="boton-secundario" title="Refrescar lista">
+                    Actualizar
+                </button>
+            </div>
+            <ul id="lista-videos" class="lista-videos">
+                <li class="vacio">Cargando lista de videos...</li>
+            </ul>
+        </section>
+    </main>
+    <script src="/compartido/protocolo.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

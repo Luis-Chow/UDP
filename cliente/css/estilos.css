@@ -1,0 +1,371 @@
+/* ============================================================
+   Estilos para la aplicacion de streaming de video sobre UDP
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --color-fondo: #0f1419;
+    --color-panel: #1a2332;
+    --color-panel-claro: #243044;
+    --color-borde: #2d3a52;
+    --color-texto: #e6edf3;
+    --color-texto-tenue: #8b949e;
+    --color-acento: #58a6ff;
+    --color-acento-hover: #79b8ff;
+    --color-exito: #3fb950;
+    --color-error: #f85149;
+    --color-aviso: #d29922;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+    color: var(--color-texto);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ------------------------- Encabezado ------------------------- */
+.encabezado {
+    background-color: var(--color-panel);
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--color-borde);
+    box-shadow: var(--sombra);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.encabezado h1 {
+    font-size: 1.6rem;
+    color: var(--color-acento);
+}
+
+.subtitulo {
+    color: var(--color-texto-tenue);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.estado-conexion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.indicador {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.indicador.conectado {
+    background-color: var(--color-exito);
+    box-shadow: 0 0 8px var(--color-exito);
+}
+
+.indicador.desconectado {
+    background-color: var(--color-error);
+    box-shadow: 0 0 8px var(--color-error);
+}
+
+.indicador.transmitiendo {
+    background-color: var(--color-aviso);
+    box-shadow: 0 0 8px var(--color-aviso);
+    animation: parpadeo 1s infinite;
+}
+
+@keyframes parpadeo {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ------------------------- Layout principal ------------------------- */
+.contenedor {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    padding: 20px 40px;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .contenedor {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+}
+
+/* ------------------------- Paneles ------------------------- */
+.panel-lista,
+.panel-reproductor {
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+
+.cabecera-panel {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--color-borde);
+    background-color: var(--color-panel-claro);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cabecera-panel h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* ------------------------- Lista de videos ------------------------- */
+.lista-videos {
+    list-style: none;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.lista-videos li {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-borde);
+    cursor: pointer;
+    transition: background-color 0.15s, padding-left 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lista-videos li:hover {
+    background-color: var(--color-panel-claro);
+    padding-left: 26px;
+}
+
+.lista-videos li.activo {
+    background-color: var(--color-panel-claro);
+    border-left: 3px solid var(--color-acento);
+    padding-left: 17px;
+    color: var(--color-acento);
+}
+
+/* Video ya descargado y guardado en cache local */
+.lista-videos li.cacheado::after {
+    content: "●";
+    margin-left: auto;
+    color: var(--color-exito);
+    font-size: 0.75rem;
+    text-shadow: 0 0 6px var(--color-exito);
+}
+
+.lista-videos li.vacio {
+    color: var(--color-texto-tenue);
+    font-style: italic;
+    cursor: default;
+}
+
+.lista-videos li.vacio:hover {
+    background-color: transparent;
+    padding-left: 20px;
+}
+
+.lista-videos li::before {
+    content: "▶";
+    font-size: 0.7rem;
+    color: var(--color-texto-tenue);
+}
+
+.lista-videos li.vacio::before {
+    content: "";
+}
+
+/* ------------------------- Reproductor ------------------------- */
+.contenedor-video {
+    position: relative;
+    background-color: #000;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#reproductor {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.cargando {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--color-texto);
+    padding: 20px;
+}
+
+.cargando.oculto {
+    display: none;
+}
+
+.anillo {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--color-borde);
+    border-top-color: var(--color-acento);
+    border-radius: 50%;
+    animation: girar 1s linear infinite;
+}
+
+@keyframes girar {
+    to { transform: rotate(360deg); }
+}
+
+.barra-progreso {
+    width: 80%;
+    max-width: 400px;
+    height: 8px;
+    background-color: var(--color-borde);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.relleno-progreso {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--color-acento), var(--color-acento-hover));
+    transition: width 0.1s linear;
+}
+
+.porcentaje {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-acento);
+}
+
+/* ------------------------- Estadisticas ------------------------- */
+.estadisticas {
+    padding: 20px;
+    border-top: 1px solid var(--color-borde);
+}
+
+.estadisticas h3,
+.registro h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: var(--color-texto-tenue);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.rejilla-estadisticas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.estadistica {
+    background-color: var(--color-panel-claro);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--color-borde);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.estadistica .etiqueta {
+    font-size: 0.75rem;
+    color: var(--color-texto-tenue);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.estadistica .valor {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-texto);
+    font-family: 'Courier New', monospace;
+}
+
+/* ------------------------- Registro ------------------------- */
+.registro {
+    padding: 20px;
+    border-top: 1px solid var(--color-borde);
+}
+
+.caja-registro {
+    background-color: #0d1117;
+    border: 1px solid var(--color-borde);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--color-texto-tenue);
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ------------------------- Botones ------------------------- */
+.boton-secundario {
+    background-color: var(--color-panel-claro);
+    color: var(--color-texto);
+    border: 1px solid var(--color-borde);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.boton-secundario:hover {
+    background-color: var(--color-borde);
+    border-color: var(--color-acento);
+}
+
+/* ------------------------- Pie ------------------------- */
+.pie {
+    text-align: center;
+    padding: 16px;
+    color: var(--color-texto-tenue);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--color-borde);
+    background-color: var(--color-panel);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-panel);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-borde);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-texto-tenue);
+}
