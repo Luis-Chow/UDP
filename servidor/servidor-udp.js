@@ -53,7 +53,11 @@ function enviarVideo(nombre, direccion, puerto) {
             servidor.send(armarPaquete(TIPO.DATA, secuencia, totalPaquetes, fragmento), puerto, direccion);
         }
         if (secuencia < totalPaquetes) {
-            setImmediate(enviarLote);
+            if (config.PAUSA_LOTE_MS > 0) {
+                setTimeout(enviarLote, config.PAUSA_LOTE_MS);
+            } else {
+                setImmediate(enviarLote);
+            }
         } else {
             const fin = armarPaquete(TIPO.END, totalPaquetes, totalPaquetes);
             for (let i = 0; i < config.REENVIOS_FIN; i++) {

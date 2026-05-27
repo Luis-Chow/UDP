@@ -11,5 +11,9 @@ module.exports = {
 
     TAMANO_PAYLOAD: 1400,
     PAQUETES_POR_LOTE: 16,
-    REENVIOS_FIN: 5
+    REENVIOS_FIN: 5,
+
+    // Pausa entre lotes (ms). 0 = lo mas rapido (localhost descarga en ~3s).
+    // Subir para simular una red mas lenta y poder ver el streaming.
+    PAUSA_LOTE_MS: 2
 };
