@@ -4,6 +4,10 @@ const path = require('path');
 
 const config = require('./config');
 const { TIPO, TAMANO_CABECERA } = require('../compartido/protocolo');
+const { prepararVideos } = require('./preparar-videos');
+
+// Antes de arrancar, dejamos todos los videos listos para streaming
+prepararVideos();
 
 const servidor = dgram.createSocket('udp4');
 
@@ -28,13 +32,28 @@ function enviarLista(direccion, puerto) {
     console.log(`[UDP] Lista enviada a ${direccion}:${puerto} (${lista.length} videos)`);
 }
 
+// Transmisiones en curso por cliente ("ip:puerto" -> token de cancelacion).
+// Si un cliente pide otro video antes de que termine el actual, marcamos el
+// token viejo como cancelado para que su bucle de envio se detenga.
+const transmisiones = new Map();
+
 function enviarVideo(nombre, direccion, puerto) {
+    const clienteId = `${direccion}:${puerto}`;
+
+    // Cancelar la transmision anterior de este cliente, si la hay
+    const anterior = transmisiones.get(clienteId);
+    if (anterior) anterior.cancelado = true;
+
     const ruta = path.join(config.CARPETA_VIDEOS, nombre);
     if (!fs.existsSync(ruta)) {
         const err = armarPaquete(TIPO.ERROR, 0, 0, Buffer.from('Video no encontrado'));
         servidor.send(err, puerto, direccion);
         return;
     }
+
+    // Token de esta transmision. El bucle revisa token.cancelado en cada lote.
+    const token = { cancelado: false };
+    transmisiones.set(clienteId, token);
 
     const datos = fs.readFileSync(ruta);
     const totalPaquetes = Math.ceil(datos.length / config.TAMANO_PAYLOAD);
@@ -45,6 +64,7 @@ function enviarVideo(nombre, direccion, puerto) {
 
     let secuencia = 0;
     function enviarLote() {
+        if (token.cancelado) return; // el cliente pidio otro video, abortamos
         const limite = Math.min(secuencia + config.PAQUETES_POR_LOTE, totalPaquetes);
         for (; secuencia < limite; secuencia++) {
             const inicio = secuencia * config.TAMANO_PAYLOAD;
@@ -61,8 +81,9 @@ function enviarVideo(nombre, direccion, puerto) {
         } else {
             const fin = armarPaquete(TIPO.END, totalPaquetes, totalPaquetes);
             for (let i = 0; i < config.REENVIOS_FIN; i++) {
-                setTimeout(() => servidor.send(fin, puerto, direccion), i * 20);
+                setTimeout(() => { if (!token.cancelado) servidor.send(fin, puerto, direccion); }, i * 20);
             }
+            transmisiones.delete(clienteId);
             console.log(`[UDP] "${nombre}" enviado`);
         }
     }

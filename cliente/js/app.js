@@ -219,6 +219,12 @@ function manejarPaquete(buffer) {
     if (tipo !== TIPO.DATA) return;
 
     const secuencia = vista.getUint32(1, false); // big-endian
+    const total = vista.getUint32(5, false);     // total de paquetes de ESE video
+
+    // Si el total no coincide con el del video actual, es un paquete rezagado
+    // de un video anterior (cambiaste de video a mitad de descarga). Lo ignoro.
+    if (total !== totalEsperados) return;
+
     const datos = new Uint8Array(buffer, TAMANO_CABECERA);
 
     // Solo cuento el paquete si no lo tenia antes (por si llega duplicado)
